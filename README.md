@@ -86,7 +86,7 @@ run.bat
 ### Manual Setup:
 1. Clone or download this repository:
    ```powershell
-   git clone https://github.com/your-username/coc-attacker-bot.git
+   git clone https://github.com/Dhruv-Gupta-1/coc-attack-automation.git
    cd coc-attacker-bot
    ```
 2. Install requirements:
