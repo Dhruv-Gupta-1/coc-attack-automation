@@ -198,7 +198,7 @@ class AutomationController:
             self.clicker.click_at(t.center_x, t.center_y, label=f"Collect {t.name}", duration=0.15)
             time.sleep(0.18)
 
-    def run_single_attack_cycle(self, win_rect: tuple, battle_time_sec: int = 105):
+    def run_single_attack_cycle(self, win_rect: tuple, battle_time_sec: int = 75, drag_duke_count: int = 1, dragon_count: int = 16):
         """
         Executes the exact visual sequence with strict verification:
         1. Detect & click Battle icon ('battle.png'). Verify 'find_a_match.png' appears.
@@ -317,7 +317,7 @@ class AutomationController:
             self.clicker.click_at(slot1_x, slot1_y, label="Drag Duke (Slot 1)")
         
         time.sleep(0.35)
-        self.clicker.deploy_troops_16_times(win_rect, troop_name="Dragon Duke", count=16)
+        self.clicker.deploy_troops_16_times(win_rect, troop_name="Dragon Duke", count=drag_duke_count)
         time.sleep(0.4)
 
         if not self.is_running or self.clicker.should_stop:
@@ -341,20 +341,20 @@ class AutomationController:
             self.clicker.click_at(slot_drag_x, slot_drag_y, label="Dragon (Troop Slot)")
 
         time.sleep(0.35)
-        self.clicker.deploy_troops_16_times(win_rect, troop_name="Dragon", count=16)
+        self.clicker.deploy_troops_16_times(win_rect, troop_name="Dragon", count=dragon_count)
 
-        self.log("✅ BOTH Drag Duke and Dragon deployed 16 times outside the red line!")
+        self.log(f"✅ Drag Duke ({drag_duke_count}x) and Dragon ({dragon_count}x) deployed outside the red line!")
 
         if not self.is_running or self.clicker.should_stop:
             return
 
-        # ─── Step 6: Wait for a total of 1 minute 45 seconds (105 seconds) ───────────
-        battle_duration_sec = battle_time_sec if battle_time_sec > 0 else 105
-        self.set_status(f"[Step 6] Battle in progress — waiting 1m 45s ({battle_duration_sec}s)...")
-        self.log(f"⏳ [Step 6] Dragons attacking! Waiting 1 minute 45 seconds ({battle_duration_sec}s)...")
+        # ─── Step 6: Wait for battle duration before ending attack (Default: 75 seconds) ───
+        battle_duration_sec = battle_time_sec if battle_time_sec > 0 else 75
+        self.set_status(f"[Step 6] Battle in progress — {battle_duration_sec}s countdown...")
+        self.log(f"⏳ [Step 6] Attack in progress! Waiting {battle_duration_sec} seconds before ending battle...")
 
         elapsed = 0
-        step_slice = 10
+        step_slice = 2
         while elapsed < battle_duration_sec:
             if not self.is_running or self.clicker.should_stop:
                 return
@@ -371,8 +371,9 @@ class AutomationController:
                 break
 
             if rem_left > 0:
-                self.set_status(f"[Step 6] Battle ongoing — {rem_left}s remaining of 1m 45s...")
-                self.log(f"⏱️ Battle ongoing: {rem_left}s remaining...")
+                self.set_status(f"[Step 6] Battle ongoing — {rem_left}s remaining before End Battle...")
+                if rem_left % 10 == 0 or rem_left <= 5:
+                    self.log(f"⏱️ Battle ongoing: {rem_left}s remaining...")
 
         if not self.is_running or self.clicker.should_stop:
             return
@@ -445,7 +446,7 @@ class AutomationController:
 
         self.dismiss_any_popups(win_rect=win_rect)
 
-    def start_automation(self, cycles: int = 1, battle_wait_sec: int = 150):
+    def start_automation(self, cycles: int = 1, battle_wait_sec: int = 75, drag_duke_count: int = 1, dragon_count: int = 16):
         """Starts the visual automation loop in a background thread."""
         if self.is_running:
             return
@@ -456,7 +457,7 @@ class AutomationController:
         self.current_cycle = 0
 
         def _loop():
-            self.log(f"🚀 CoC Vision Automation started for {cycles} cycle(s).")
+            self.log(f"🚀 CoC Vision Automation started for {cycles} cycle(s). Attack limit: {battle_wait_sec}s.")
             try:
                 for c in range(1, cycles + 1):
                     if not self.is_running or self.clicker.should_stop:
@@ -474,7 +475,12 @@ class AutomationController:
                             self.log("❌ Game window missing. Stopping automation.")
                             break
 
-                    self.run_single_attack_cycle(win_rect, battle_time_sec=battle_wait_sec)
+                    self.run_single_attack_cycle(
+                        win_rect,
+                        battle_time_sec=battle_wait_sec,
+                        drag_duke_count=drag_duke_count,
+                        dragon_count=dragon_count
+                    )
                     self.log(f"✅ Cycle {c} completed successfully!")
                     
                     if c < cycles and self.is_running and not self.clicker.should_stop:

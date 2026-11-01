@@ -9,10 +9,12 @@ DEFAULT_CONFIG = {
     "gemini_api_key": "",
     "gemini_model": "gemini-3.1-flash-lite",
     "cycles": 5,
-    "battle_wait_seconds": 105,
+    "battle_wait_seconds": 75,
+    "drag_duke_count": 1,
+    "dragon_count": 16,
     "target_window": "Clash of Clans",
     "detection_threshold": 0.68,
-    "troop_1_count": 16,
+    "troop_1_count": 1,
     "troop_2_count": 16,
     "auto_reload_on_disconnect": True
 }

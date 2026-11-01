@@ -18,9 +18,11 @@ Unlike legacy bots that rely on fragile hardcoded pixel coordinates, **COC Attac
   - Eliminates false positive logs. Every button click is immediately verified against the expected screen state (e.g. verifying the Match screen appears before looking for the Match button).
   - Automatically retries clicks with window refocusing if a transition is delayed.
 - **Dual Dragon Deployment**:
-  - Automatically selects and deploys **both Dragon Duke (`drag_duke.png`) and Electro Dragons/Dragons (`dragon.png`)** identically across 16 distinct perimeter drop points outside the red line.
+  - Automatically selects and deploys **Dragon Duke (1x hero deployment)** followed by **Electro Dragons/Dragons (16x perimeter drop points)** outside the red line.
+- **Customizable Attack Duration**:
+  - Automatically times battles (default: 75 seconds) and triggers End Battle / Surrender, fully adjustable directly from the dashboard controls.
 - **DirectInput / Win32 Hardware Actuation**:
-  - Dispatches native Windows `mouse_event` signals with humanized hold times (60ms–90ms) to ensure 100% input delivery into hardware-accelerated DirectX emulators and Google Play Games PC.
+  - Dispatches native Windows `mouse_event` signals with humanized hold times (70ms–90ms) to ensure 100% single-click input delivery into hardware-accelerated DirectX emulators and Google Play Games PC.
 - **Automatic Disconnection Recovery**:
   - Visually detects the *"Anyone there? You have been disconnected due to inactivity"* popup, automatically clicks **RELOAD GAME**, and waits for the village to reload.
 - **Dual-Backend Vision Engine**:
@@ -37,13 +39,13 @@ Unlike legacy bots that rely on fragile hardcoded pixel coordinates, **COC Attac
 
 ```mermaid
 flowchart TD
-    A["Home Village Base"] --> B["1. Click Battle Icon"]
-    B -->|Verified: Find Match appears| C["2. Click Find a Match Icon"]
+    A["Home Village Base"] --> B["1. Click Battle Icon (Single Click)"]
+    B -->|Verified: Find Match appears| C["2. Click Find a Match Icon (Single Click)"]
     C -->|Verified: Attack button appears| D["3. Click Attack Icon"]
     D -->|Verified: Battle starts / Clouds clear| E["4. Settle 5s & Zoom Out Max"]
-    E --> F["5A. Select Dragon Duke & Deploy 16x Outside Red Line"]
+    E --> F["5A. Select Dragon Duke & Deploy 1x Outside Red Line"]
     F --> G["5B. Select Dragon & Deploy 16x Outside Red Line"]
-    G --> H["6. Wait 1m 45s (105s Battle Countdown)"]
+    G --> H["6. Wait 75s (Customizable Attack Limit)"]
     H --> I["7. Click End Battle / Surrender"]
     I -->|Verified: OK Dialog appears| J["8. Click OK Confirmation"]
     J -->|Verified: Return Home appears| K["9. Click Return Home"]

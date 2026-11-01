@@ -194,27 +194,38 @@ class CoCAttackerBotApp(tk.Tk):
         self.spn_cycles.delete(0, tk.END)
         self.spn_cycles.insert(0, str(self.cfg.get("cycles", 5)))
 
-        # Battle Wait Seconds (Default: 105s = 1m 45s)
-        tk.Label(cfg_frame, text="Battle Wait:", font=("Segoe UI", 9, "bold"), fg=self.c_gold, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 4))
-        self.spn_battle_wait = tk.Spinbox(cfg_frame, from_=30, to=240, increment=5, width=5, bg="#090d16", fg=self.c_text,
+        # Attack Duration Limit (sec) - Default: 75s
+        tk.Label(cfg_frame, text="Attack Limit:", font=("Segoe UI", 9, "bold"), fg=self.c_gold, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 4))
+        self.spn_battle_wait = tk.Spinbox(cfg_frame, from_=10, to=300, increment=5, width=5, bg="#090d16", fg=self.c_text,
                                           insertbackground=self.c_gold, font=("Consolas", 10), justify="center")
-        self.spn_battle_wait.pack(side=tk.LEFT, padx=(0, 4))
+        self.spn_battle_wait.pack(side=tk.LEFT, padx=(0, 2))
         self.spn_battle_wait.delete(0, tk.END)
-        self.spn_battle_wait.insert(0, str(self.cfg.get("battle_wait_seconds", 105)))
-        tk.Label(cfg_frame, text="sec (1m 45s)", font=("Segoe UI", 9), fg=self.c_muted, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 16))
+        self.spn_battle_wait.insert(0, str(self.cfg.get("battle_wait_seconds", 75)))
+        tk.Label(cfg_frame, text="sec", font=("Segoe UI", 9), fg=self.c_muted, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 14))
 
-        # Target Window Name
-        tk.Label(cfg_frame, text="Target Window:", font=("Segoe UI", 9, "bold"), fg=self.c_gold, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 4))
-        self.var_target_win = tk.StringVar(value=self.cfg.get("target_window", "Clash of Clans"))
-        ent_win = tk.Entry(cfg_frame, textvariable=self.var_target_win, width=16, bg="#090d16", fg=self.c_text,
-                           insertbackground=self.c_gold, font=("Segoe UI", 9))
-        ent_win.pack(side=tk.LEFT, padx=(0, 8))
+        # Drag Duke deployment count (Default: 1X)
+        tk.Label(cfg_frame, text="Drag Duke:", font=("Segoe UI", 9, "bold"), fg=self.c_gold, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 4))
+        self.spn_duke_count = tk.Spinbox(cfg_frame, from_=1, to=16, width=3, bg="#090d16", fg=self.c_text,
+                                         insertbackground=self.c_gold, font=("Consolas", 10), justify="center")
+        self.spn_duke_count.pack(side=tk.LEFT, padx=(0, 2))
+        self.spn_duke_count.delete(0, tk.END)
+        self.spn_duke_count.insert(0, str(self.cfg.get("drag_duke_count", 1)))
+        tk.Label(cfg_frame, text="x", font=("Segoe UI", 9), fg=self.c_muted, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 14))
+
+        # Dragon deployment count (Default: 16X)
+        tk.Label(cfg_frame, text="Dragons:", font=("Segoe UI", 9, "bold"), fg=self.c_gold, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 4))
+        self.spn_dragon_count = tk.Spinbox(cfg_frame, from_=1, to=30, width=3, bg="#090d16", fg=self.c_text,
+                                           insertbackground=self.c_gold, font=("Consolas", 10), justify="center")
+        self.spn_dragon_count.pack(side=tk.LEFT, padx=(0, 2))
+        self.spn_dragon_count.delete(0, tk.END)
+        self.spn_dragon_count.insert(0, str(self.cfg.get("dragon_count", 16)))
+        tk.Label(cfg_frame, text="x", font=("Segoe UI", 9), fg=self.c_muted, bg=self.c_card).pack(side=tk.LEFT, padx=(0, 14))
 
         # 10-Step Visual Flow Roadmap Banner
         roadmap_card = tk.Frame(self.tab_dashboard, bg="#0b1329", padx=10, pady=5, highlightthickness=1, highlightbackground="#334155")
         roadmap_card.pack(fill=tk.X, pady=(0, 6))
 
-        steps_text = "⚔️ Sequence: 1. Battle (Verified) ➔ 2. Find Match (Verified) ➔ 3. Attack (Verified) ➔ 4. Settle 5s & Zoom Out ➔ 5. Deploy Drag Duke (16x) & Dragon (16x) ➔ 6. Wait 1m 45s ➔ 7. End Battle / Surrender ➔ 8. OK ➔ 9. Return Home ➔ 10. Repeat"
+        steps_text = "⚔️ Sequence: 1. Battle (Single Click) ➔ 2. Find Match (Single Click) ➔ 3. Attack ➔ 4. Zoom Out ➔ 5. Deploy Drag Duke (1x) & Dragon (16x) ➔ 6. Wait (Custom Limit) ➔ 7. End Battle / Surrender ➔ 8. OK ➔ 9. Return Home"
         tk.Label(roadmap_card, text=steps_text, font=("Segoe UI", 8), fg="#93c5fd", bg="#0b1329", justify="left").pack(anchor="w")
 
         # Live Status Strip
@@ -449,16 +460,30 @@ class CoCAttackerBotApp(tk.Tk):
             try:
                 cycles = int(self.spn_cycles.get())
                 battle_wait = int(self.spn_battle_wait.get())
+                duke_count = int(self.spn_duke_count.get())
+                dragon_count = int(self.spn_dragon_count.get())
             except ValueError:
                 cycles = 5
-                battle_wait = 105
+                battle_wait = 75
+                duke_count = 1
+                dragon_count = 16
             self.cfg["cycles"] = cycles
             self.cfg["battle_wait_seconds"] = battle_wait
+            self.cfg["drag_duke_count"] = duke_count
+            self.cfg["dragon_count"] = dragon_count
             save_config(self.cfg)
 
             self.btn_main_run.config(text="⏹ STOP ATTACK CYCLE", style="Crimson.TButton")
-            self.controller.start_automation(cycles=cycles, battle_wait_sec=battle_wait)
-            self._log_history_entry("Started Verified Attack Cycle", f"Running {cycles} cycle(s) with dual dragon deployment and strict state verification.")
+            self.controller.start_automation(
+                cycles=cycles,
+                battle_wait_sec=battle_wait,
+                drag_duke_count=duke_count,
+                dragon_count=dragon_count
+            )
+            self._log_history_entry(
+                "Started Verified Attack Cycle",
+                f"Running {cycles} cycle(s), attack limit: {battle_wait}s, Drag Duke ({duke_count}x), Dragon ({dragon_count}x)."
+            )
 
     def quick_collect_resources(self):
         self.log("💰 Launching 1-Click Loot Collection...")
