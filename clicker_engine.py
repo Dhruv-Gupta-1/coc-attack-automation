@@ -137,13 +137,11 @@ class ClickerEngine:
             time.sleep(0.06)
             user32.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
         else:
+            # STRICT SINGLE CLICK: Press Down, hold 70-90ms for touch registration, Release Up
             user32.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
-            time.sleep(random.uniform(0.06, 0.09)) # Genuine hardware touch hold duration
+            time.sleep(random.uniform(0.07, 0.09)) # Genuine hardware touch hold duration
             user32.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
-
-        # PyAutoGUI backup dispatch
-        pyautogui.moveTo(jitter_x, jitter_y, duration=0.01)
-        pyautogui.click()
+            time.sleep(0.05)
 
     def zoom_out(self, center_x: int, center_y: int, ticks: int = 18):
         """Moves to center and scrolls down to zoom out to max view."""
@@ -203,9 +201,8 @@ class ClickerEngine:
             user32.SetCursorPos(jx, jy)
             time.sleep(0.02)
             user32.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
-            time.sleep(0.04)
+            time.sleep(0.05)
             user32.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
-            pyautogui.click(jx, jy)
             self.log(f"💥 [{troop_name}] {i+1}/{count} deployed outside red line at ({jx}, {jy})")
             time.sleep(0.10)
 

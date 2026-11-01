@@ -31,7 +31,7 @@ class CoCAttackerBotApp(tk.Tk):
     """
     def __init__(self):
         super().__init__()
-        self.title("⚔️ COC Attacker Bot — Autonomous Visual Bot")
+        self.title("⚔️ CoC Commander — Autonomous Visual Screen Bot")
         self.geometry("920x660")
         self.minsize(840, 580)
 
